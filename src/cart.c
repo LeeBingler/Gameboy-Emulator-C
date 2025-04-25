@@ -129,7 +129,7 @@ const char *cart_lic_name(void) {
     return "UNKNOWN";
 }
 
-const char *get_cart_romtype_name(void) {
+const char *cart_romtype_name(void) {
     if(ctx.header->cartridge_type < 34)
         return ROM_TYPES[ctx.header->cartridge_type];
 
@@ -172,7 +172,7 @@ bool load_cart(char *cart_name) {
 #ifdef DEBUG
     printf("Cartridge Loaded:\n");
     printf("\t Title    : %s\n", ctx.header->title);
-    printf("\t Type     : %2.2X (%s)\n", ctx.header->cartridge_type, cart_type_name());
+    printf("\t Type     : %2.2X (%s)\n", ctx.header->cartridge_type, cart_romtype_name());
     printf("\t ROM Size : %d KB\n", 32 << ctx.header->rom_size);
     printf("\t RAM Size : %2.2X\n", ctx.header->ram_size);
     printf("\t LIC Code : %2.2X (%s)\n", ctx.header->old_licence_code, cart_lic_name());

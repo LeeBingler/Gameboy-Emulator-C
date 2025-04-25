@@ -1,11 +1,10 @@
 # === Configuration ===
 
 CC 		:= 	gcc
-
-CFLAGS	:=	-g3 -Wall -Wextra
-
 NAME	:=	gameboy-emulator-c
 
+CFLAGS	:=	-Wall -Wextra -DNAME_EXEC=\"$(NAME)\"
+DFLAGS	:=	-g3 -DDEBUG
 
 SRC		:=	src/main.c	\
 			src/cart.c	\
@@ -18,8 +17,15 @@ OBJ		:=	$(SRC:.c=.o)
 
 all: 	$(NAME)
 
+
+debug: 	CFLAGS += $(DFLAGS)
+debug: 	$(NAME)
+
 $(NAME):	$(OBJ)
 	$(CC) $(CFLAGS) -o $(NAME) $(OBJ)
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 	rm -f $(OBJ)
@@ -29,7 +35,4 @@ fclean: clean
 
 re:	fclean all
 
-test:
-	echo "No test."
-
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re debug
