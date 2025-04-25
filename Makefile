@@ -3,7 +3,7 @@
 CC 		:= 	gcc
 NAME	:=	gameboy-emulator-c
 
-CFLAGS	:=	-Wall -Wextra -DNAME_EXEC=\"$(NAME)\"
+CFLAGS	:=	-Wall -Wextra -DNAME_EXEC=\"$(NAME)\" -Iinclude
 DFLAGS	:=	-g3 -DDEBUG
 
 SRC		:=	src/main.c	\

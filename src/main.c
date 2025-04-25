@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../include/common.h"
-#include "../include/cart.h"
+#include "gbemulator/common.h"
+#include "gbemulator/cart.h"
 
 static void print_helper(void) {
     printf("Usage: %s <rom_file>\n", NAME_EXEC);

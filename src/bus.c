@@ -1,4 +1,4 @@
-#include "../include/cart.h"
+#include "gbemulator/cart.h"
 
 u8 bus_read(u16 address) {
     if (address < 0x7fff)

@@ -1,3 +1,3 @@
-#include "../include/cpu.h"
+#include "gbemulator/cpu.h"
 
 static cpu_context ctx = {0};
