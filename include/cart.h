@@ -19,6 +19,15 @@ typedef struct {
     u16 global_checksum;
 } rom_header;
 
+typedef struct {
+    char filename[1024];
+    u32 rom_size;
+    u8 *rom_data;
+    rom_header *header;
+} cart_context;
 
 bool load_cart(char *cart_name);
 void free_cart(void);
+
+u8 cart_read(u16 address);
+u8 cart_write(u16 address, u16 value);

@@ -4,13 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct {
-    char filename[1024];
-    u32 rom_size;
-    u8 *rom_data;
-    rom_header *header;
-} cart_context;
-
 static cart_context ctx = { 0 };
 
 static const char *ROM_TYPES[35] = {
@@ -115,6 +108,15 @@ static const char *LIC_CODE[0xA5] = {
     [0xA4] = "Konami (Yu-Gi-Oh!)"
 };
 
+
+u8 cart_read(u16 address) {
+    return ctx.rom_data[address];
+}
+
+u8 cart_write(u16 address, u16 value) {
+    return 0;
+}
+
 void free_cart(void) {
     free(ctx.rom_data);
 }
@@ -167,11 +169,25 @@ bool load_cart(char *cart_name) {
     ctx.header = (rom_header *)(ctx.rom_data + 0x100);
     ctx.header->title[15] = '\0';
 
+#ifdef DEBUG
+    printf("Cartridge Loaded:\n");
+    printf("\t Title    : %s\n", ctx.header->title);
+    printf("\t Type     : %2.2X (%s)\n", ctx.header->cartridge_type, cart_type_name());
+    printf("\t ROM Size : %d KB\n", 32 << ctx.header->rom_size);
+    printf("\t RAM Size : %2.2X\n", ctx.header->ram_size);
+    printf("\t LIC Code : %2.2X (%s)\n", ctx.header->old_licence_code, cart_lic_name());
+    printf("\t ROM Vers : %2.2X\n", ctx.header->rom_version);
+#endif
+
     // Checksum test (https://gbdev.io/pandocs/The_Cartridge_Header.html#014d--header-checksum)
     u16 checksum = 0;
     for (u16 address = 0x0134; address <= 0x014c; address++) {
         checksum = checksum - ctx.rom_data[address] - 1;
     }
+
+#ifdef DEBUG
+    printf("\t Checksum : %2.2X (%s)\n", ctx.header->checksum, (checksum & 0xFF) ? "PASSED" : "FAILED");
+#endif
 
     return true;
 }
