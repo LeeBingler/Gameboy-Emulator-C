@@ -1,6 +1,7 @@
 #pragma once
 
-#include "common.h"
+#include "gbemulator/common.h"
+#include "gbemulator/instruction.h"
 
 typedef struct {
     u8 a;
@@ -17,4 +18,5 @@ typedef struct {
 
 typedef struct {
     cpu_registers regs;
+    instruction *cur_inst;
 } cpu_context;

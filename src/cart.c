@@ -1,5 +1,5 @@
 #include "gbemulator/cart.h"
-
+#include "gbemulator/instruction.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
