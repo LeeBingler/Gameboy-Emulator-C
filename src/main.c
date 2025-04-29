@@ -1,29 +1,21 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "gbemulator/common.h"
+#include "gbemulator/parser_args.h"
+#include "gbemulator/emu.h"
+
+#include "gbemulator/cpu.h"
 #include "gbemulator/cart.h"
 
-static void print_helper(void) {
-    printf("Usage: %s <rom_file>\n", NAME_EXEC);
+static emu_context ctx = {0};
+
+emu_context *emu_get_context(void) {
+    return &ctx;
 }
 
-static bool parser_args(int argc, char **argv) {
-    for (int i = 0; i < argc; i++) {
-        if (strcmp(argv[i], "--help") == 0) {
-            print_helper();
-            return false;
-        }
-    }
-
-    if (argc != 2) {
-        fprintf(stderr, "Missing argument: missing <rom_file>\n");
-        fprintf(stderr, "Try '%s --help' for more information.\n", NAME_EXEC);
-        return false;
-    }
-
-    return true;
+void delay(u32 ms) {
+    return;
+}
+void emu_cycles(int cpu_cycles) {
+    return;
 }
 
 int main(int argc, char **argv) {
@@ -31,6 +23,27 @@ int main(int argc, char **argv) {
 
     if(!load_cart(argv[1])) return EXIT_FAILURE;
 
+    if(!cpu_init()) return EXIT_FAILURE;
+
+    ctx.running = true;
+    ctx.paused = false;
+    ctx.ticks = 0;
+
+    while(ctx.running) {
+        if (ctx.paused) {
+            delay(10);
+            continue;
+        }
+
+        if (!cpu_step()) {
+            printf("CPU Stopped\n");
+            return -3;
+        }
+
+        ctx.ticks++;
+    }
+
     free_cart();
     return EXIT_SUCCESS;
 }
+

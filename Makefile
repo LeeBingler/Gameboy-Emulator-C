@@ -7,7 +7,12 @@ CFLAGS	:=	-Wall -Wextra -DNAME_EXEC=\"$(NAME)\" -Iinclude
 DFLAGS	:=	-g3 -DDEBUG
 
 SRC		:=	src/main.c	\
+			src/parser_args.c	\
+			src/CPU/cpu.c	\
+			src/CPU/cpu_utils.c	\
+			src/bus.c	\
 			src/cart.c	\
+			src/instructions.c	\
 
 OBJ		:=	$(SRC:.c=.o)
 
