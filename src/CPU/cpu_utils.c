@@ -28,3 +28,21 @@ u16 cpu_read_reg(reg_type rt) {
         default: return 0;
     }
 }
+
+void cpu_set_flags(cpu_context *ctx, char z, char n, char h, char c) {
+    if (z != -1) {
+        BIT_SET(ctx->regs.f, 7, z);
+    }
+
+    if (n != -1) {
+        BIT_SET(ctx->regs.f, 6, n);
+    }
+
+    if (h != -1) {
+        BIT_SET(ctx->regs.f, 5, h);
+    }
+
+    if (c != -1) {
+        BIT_SET(ctx->regs.f, 4, c);
+    }
+}

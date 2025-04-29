@@ -1,6 +1,7 @@
 #include "gbemulator/cpu.h"
 #include "gbemulator/bus.h"
 #include "gbemulator/emu.h"
+#include "gbemulator/instruction.h"
 
 cpu_context ctx = {0};
 
@@ -13,18 +14,17 @@ bool cpu_init(void) {
 static bool fetch_instruction(void) {
     ctx.cur_opcode = bus_read(ctx.regs.pc++);
     ctx.cur_inst = instruction_by_opcode(ctx.cur_opcode);
-
-    if (ctx.cur_inst == NULL) {
-        fprintf(stderr, "Unknown Instruction %02X\n", ctx.cur_opcode);
-        return true;
-    }
-
     return false;
 }
 
 static bool fetch_data(void) {
     ctx.mem_dest = 0;
     ctx.dest_is_mem = false;
+
+    if (!(ctx.cur_inst)) {
+        fprintf(stderr, "Unknown Addressing Mode! %02X\n", ctx.cur_opcode);
+        return true;
+    }
 
     switch (ctx.cur_inst->mode) {
         case AM_IMP: return false;
@@ -56,22 +56,38 @@ static bool fetch_data(void) {
         default:
             fprintf(stderr, "Unknown Addressing Mode! %d (%02X)\n", ctx.cur_inst->mode, ctx.cur_opcode);
             return true;
-        }
+    }
 }
 
 static bool execute(void) {
-#ifdef DEBUG
-    printf("Executing instruction: %02X     PC %04X\n", ctx.cur_opcode, ctx.regs.pc);
-#endif
-    printf("Not executing\n");
+    IN_PROC proc = inst_get_processor(ctx.cur_inst->type);
 
-    return true;
+    if (!proc) {
+        fprintf(stderr, "execute failed\n");
+        return true;
+    }
+
+    return proc(&ctx);
 }
 
 bool cpu_step(void) {
     if (!ctx.halted) {
+        u16 pc = ctx.regs.pc;
+
         if(fetch_instruction()) return false;
         if(fetch_data()) return false;
+
+#ifdef DEBUG
+    printf("%04X: %-7s (%02X %02X %02X) A: %02X B: %02X C: %02X\n",
+            pc, inst_name(ctx.cur_inst->type), ctx.cur_opcode,
+            bus_read(pc + 1), bus_read(pc + 2), ctx.regs.a, ctx.regs.b, ctx.regs.c);
+#endif
+
+        if (ctx.cur_inst == NULL) {
+            fprintf(stderr, "Unknown Instruction %02X\n", ctx.cur_opcode);
+            return false;
+        }
+
         if(execute()) return false;
     }
     return true;
