@@ -37,6 +37,7 @@ int main(int argc, char **argv) {
 
         if (!cpu_step()) {
             printf("CPU Stopped\n");
+            free_cart();
             return -3;
         }
 
