@@ -11,6 +11,7 @@ SRC		:=	src/main.c	\
 			src/CPU/cpu.c	\
 			src/CPU/cpu_utils.c	\
 			src/CPU/cpu_proc.c	\
+			src/CPU/cpu_fetch_data.c	\
 			src/bus.c	\
 			src/cart.c	\
 			src/instructions.c	\

@@ -39,12 +39,15 @@ bool cpu_step(void);
 
 // UTILS
 u16 cpu_read_reg(reg_type rt);
+void cpu_set_reg(reg_type rt, u16 val);
 u16 reverse(u16 n);
 
 // PROC
 typedef bool (*IN_PROC)(cpu_context *ctx);
 IN_PROC inst_get_processor(in_type type);
 void cpu_set_flags(cpu_context *ctx, char z, char n, char h, char c);
+
+bool cpu_fetch_data(void);
 
 #define CPU_FLAG_Z BIT(ctx->regs.f, 7)
 #define CPU_FLAG_C BIT(ctx->regs.f, 4)
