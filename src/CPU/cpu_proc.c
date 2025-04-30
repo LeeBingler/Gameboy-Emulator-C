@@ -67,12 +67,55 @@ static bool check_cond(cpu_context *ctx) {
     return false;
 }
 
-static bool proc_jp(cpu_context *ctx) {
+static bool goto_addr(cpu_context *ctx, u16 addr, bool pushpc) {
     if(check_cond(ctx)) {
-        ctx->regs.pc = ctx->fetched_data;
+        if (pushpc) {
+            stack_push16(ctx->regs.pc);
+            emu_cycles(2);
+        }
+
+        ctx->regs.pc = addr;
         emu_cycles(1);
     }
     return false;
+}
+
+static bool proc_jp(cpu_context *ctx) {
+    return goto_addr(ctx, ctx->fetched_data, false);
+}
+
+static bool proc_jr(cpu_context *ctx) {
+    char rel = (char) (ctx->fetched_data & 0xFF);
+    u16 addr = ctx->regs.pc + rel;
+
+    return goto_addr(ctx, addr, false);
+}
+
+static bool proc_call(cpu_context *ctx) {
+    return goto_addr(ctx, ctx->fetched_data, true);
+}
+
+static bool proc_ret(cpu_context *ctx) {
+    if (ctx->cur_inst->cond != CT_NONE) {
+        emu_cycles(1);
+    }
+
+    if(check_cond(ctx)) {
+        u16 lo = stack_pop();
+        emu_cycles(1);
+
+        u16 hi = stack_pop();
+        emu_cycles(1);
+
+        u16 n = (hi << 8) | lo;
+        ctx->regs.pc = n;
+    }
+    return false;
+}
+
+static bool proc_reti(cpu_context *ctx) {
+    ctx->int_master_enabled = true;
+    return proc_ret(ctx);
 }
 
 static bool proc_pop(cpu_context *ctx) {
@@ -122,8 +165,12 @@ static IN_PROC processors[] = {
     [IN_LD] = proc_ld,
     [IN_LDH] = proc_ldh,
     [IN_JP] = proc_jp,
+    [IN_JR] = proc_jr,
     [IN_POP] = proc_pop,
     [IN_PUSH] = proc_push,
+    [IN_CALL] = proc_call,
+    [IN_RET] = proc_ret,
+    [IN_RETI] = proc_reti,
     [IN_XOR] = proc_xor,
     [IN_DI] = proc_di,
 };
