@@ -95,6 +95,10 @@ static bool proc_call(cpu_context *ctx) {
     return goto_addr(ctx, ctx->fetched_data, true);
 }
 
+static bool proc_rst(cpu_context *ctx) {
+    return goto_addr(ctx, ctx->cur_inst->param, true);
+}
+
 static bool proc_ret(cpu_context *ctx) {
     if (ctx->cur_inst->cond != CT_NONE) {
         emu_cycles(1);
@@ -169,6 +173,7 @@ static IN_PROC processors[] = {
     [IN_POP] = proc_pop,
     [IN_PUSH] = proc_push,
     [IN_CALL] = proc_call,
+    [IN_RST] = proc_rst,
     [IN_RET] = proc_ret,
     [IN_RETI] = proc_reti,
     [IN_XOR] = proc_xor,
