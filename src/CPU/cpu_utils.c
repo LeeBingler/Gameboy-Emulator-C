@@ -51,6 +51,10 @@ u16 cpu_read_reg(reg_type rt) {
     }
 }
 
+cpu_registers *cpu_get_regs(void) {
+    return &ctx.regs;
+}
+
 void cpu_set_flags(cpu_context *ctx, char z, char n, char h, char c) {
     if (z != -1) {
         BIT_SET(ctx->regs.f, 7, z);

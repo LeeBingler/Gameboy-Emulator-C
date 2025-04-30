@@ -2,6 +2,7 @@
 #include "gbemulator/common.h"
 #include "gbemulator/emu.h"
 #include "gbemulator/bus.h"
+#include "gbemulator/stack.h"
 
 
 static bool proc_none(cpu_context *ctx) {
@@ -74,6 +75,36 @@ static bool proc_jp(cpu_context *ctx) {
     return false;
 }
 
+static bool proc_pop(cpu_context *ctx) {
+    u16 lo = stack_pop();
+    emu_cycles(1);
+
+    u16 hi = stack_pop();
+    emu_cycles(1);
+
+    u16 n = (hi << 8) | lo;
+
+    if (ctx->cur_inst->reg_1 == RT_AF) {
+        cpu_set_reg(ctx->cur_inst->reg_1, n & 0xFFF0);
+    } else {
+        cpu_set_reg(ctx->cur_inst->reg_1, n);
+    }
+
+    return false;
+}
+
+static bool proc_push(cpu_context *ctx) {
+    u16 hi = (cpu_read_reg(ctx->cur_inst->reg_1) >> 8) & 0xFF;
+    emu_cycles(1);
+    stack_push(hi);
+
+    u16 lo = cpu_read_reg(ctx->cur_inst->reg_1) & 0xFF;
+    emu_cycles(1);
+    stack_push(lo);
+
+    return false;
+}
+
 static bool proc_xor(cpu_context *ctx) {
     ctx->regs.a ^= ctx->fetched_data & 0xFF;
     cpu_set_flags(ctx, ctx->regs.a == 0, 0, 0, 0);
@@ -91,6 +122,8 @@ static IN_PROC processors[] = {
     [IN_LD] = proc_ld,
     [IN_LDH] = proc_ldh,
     [IN_JP] = proc_jp,
+    [IN_POP] = proc_pop,
+    [IN_PUSH] = proc_push,
     [IN_XOR] = proc_xor,
     [IN_DI] = proc_di,
 };
