@@ -13,6 +13,7 @@ SRC		:=	src/main.c	\
 			src/CPU/cpu_proc.c	\
 			src/CPU/cpu_fetch_data.c	\
 			src/bus.c	\
+			src/ram.c	\
 			src/cart.c	\
 			src/instructions.c	\
 

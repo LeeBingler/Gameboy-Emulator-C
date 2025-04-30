@@ -114,7 +114,7 @@ u8 cart_read(u16 address) {
 }
 
 u8 cart_write(u16 address, u16 value) {
-    return 0;
+    return value;
 }
 
 void free_cart(void) {
