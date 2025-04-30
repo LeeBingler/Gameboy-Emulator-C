@@ -1,6 +1,7 @@
 #include "gbemulator/cpu.h"
 #include "gbemulator/common.h"
 #include "gbemulator/emu.h"
+#include "gbemulator/bus.h"
 
 
 static bool proc_none(cpu_context *ctx) {
@@ -13,6 +14,28 @@ static bool proc_nop(cpu_context *ctx) {
 }
 
 static bool proc_ld(cpu_context *ctx) {
+    if (ctx->dest_is_mem) {
+        if (ctx->cur_inst->reg_2 >= RT_AF) {
+            bus_write16(ctx->mem_dest, ctx->fetched_data);
+            emu_cycles(1);
+        } else {
+            bus_write(ctx->mem_dest, ctx->fetched_data);
+        }
+
+        emu_cycles(1);
+        return false;
+    }
+
+    if (ctx->cur_inst->mode == AM_HL_SPR) { // 0xF8 instruction
+        u8 hflag = (cpu_read_reg(ctx->cur_inst->reg_2) & 0xF) + (ctx->fetched_data & 0x0F) >= 0x10;
+        u8 cflag = (cpu_read_reg(ctx->cur_inst->reg_2) & 0xFF) + (ctx->fetched_data & 0x0F) >= 0x100;
+
+        cpu_set_flags(ctx, 0, 0, hflag, cflag);
+        cpu_set_reg(ctx->cur_inst->reg_1, cpu_read_reg(ctx->cur_inst->reg_2) + (char) ctx->fetched_data);
+        return false;
+    }
+
+    cpu_set_reg(ctx->cur_inst->reg_1, ctx->fetched_data);
     return false;
 }
 
