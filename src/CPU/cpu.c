@@ -35,7 +35,9 @@ static bool execute(void) {
 
 bool cpu_step(void) {
     if (!ctx.halted) {
+#ifdef DEBUG
         u16 pc = ctx.regs.pc;
+#endif
 
         if(fetch_instruction()) return false;
         if(cpu_fetch_data()) return false;

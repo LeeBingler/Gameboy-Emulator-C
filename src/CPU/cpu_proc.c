@@ -10,6 +10,7 @@ static bool proc_none(cpu_context *ctx) {
 }
 
 static bool proc_nop(cpu_context *ctx) {
+    (void) ctx;
     return false;
 }
 

@@ -30,7 +30,7 @@ typedef struct {
     bool stepping;
 
     bool int_master_enabled;
-
+    u8 ie_register;
 } cpu_context;
 
 
@@ -48,6 +48,10 @@ IN_PROC inst_get_processor(in_type type);
 void cpu_set_flags(cpu_context *ctx, char z, char n, char h, char c);
 
 bool cpu_fetch_data(void);
+
+// IE
+u8 cpu_get_ie_register(void);
+u8 cpu_set_ie_register(u8 val);
 
 #define CPU_FLAG_Z BIT(ctx->regs.f, 7)
 #define CPU_FLAG_C BIT(ctx->regs.f, 4)

@@ -1,6 +1,7 @@
 #include "gbemulator/common.h"
 #include "gbemulator/cart.h"
 #include "gbemulator/ram.h"
+#include "gbemulator/cpu.h"
 
 #define NOT_IMPL {printf("NOT implemented: accessing address %04X\n", address); return 0;}
 
@@ -34,10 +35,10 @@ u8 bus_read(u16 address) {
         return hram_read(address);
     } else if (address == 0xFFFF) {
         // Interrupt switch
-        NOT_IMPL
+        return cpu_get_ie_register();
     }
 
-    printf("Unknown bus_read(%04X)\n", address);
+    fprintf(stderr, "Unknown bus_read(%04X)\n", address);
     return 0;
 }
 
@@ -71,10 +72,10 @@ u8 bus_write(u16 address, u16 value) {
         return hram_write(address, value);
     } else if (address == 0xFFFF) {
         // Interrupt switch
-        NOT_IMPL
+        return cpu_set_ie_register(value);
     }
 
-    printf("Unknown bus_write(%04X, %04X)\n", address, value);
+    fprintf(stderr, "Unknown bus_write(%04X, %04X)\n", address, value);
     return 0;
 }
 
